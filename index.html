@@ -857,7 +857,7 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 6px;
+      height: 4px;
       background: linear-gradient(90deg, #a855f7, #ec4899, #6366f1);
     }
 
@@ -1611,7 +1611,7 @@
           <h3 style="color: #a855f7; margin-bottom: 10px;">🎉 Wish Made! 🎉</h3>
           <p style="color: #4b5563; font-size: 14px;">May all your wishes come true this year, Kashish! 💫</p>
           <button id="relightBtn" style="margin-top: 15px; padding: 10px 20px; background: #a855f7; color: white; border: none; border-radius: 999px; cursor: pointer; font-size: 14px;">
-            Light Candles Again 🕯️
+            Click to Light Candles Again 🕯️
           </button>
         </div>
       </div>
@@ -2035,32 +2035,70 @@ window.addEventListener('pageshow', (e) => {
       blownOutCount = 0;
       wishMessage.style.display = 'none';
     });
+    // ===== Glimpse Of Your Beauty - Different Song Per Image =====
 
-    // ===== COUNTDOWN TO NEXT BIRTHDAY =====
-    function updateNextBirthdayCountdown() {
-      const now = new Date();
-      const currentYear = now.getFullYear();
-      let nextBirthday = new Date(currentYear, 11, 27); // December 27
+// Select ONLY images inside Glimpse Of Your Beauty section
+// ===== Glimpse Of Your Beauty - Mobile Safe Audio Control =====
+const beautySection = document.querySelector('#photos');
+const beautyImages = beautySection.querySelectorAll('.gallery-img');
 
-      if (now > nextBirthday) {
-        nextBirthday = new Date(currentYear + 1, 11, 27);
-      }
+// Song list (order matters)
+const beautySongs = [
+  'song/img-song1.mp3',
+  'song/img-song2.mp3',
+  'song/img-song3.mp3',
+  'song/img-song4.mp3',
+  'song/img-song5.mp3'
+];
 
-      const diff = nextBirthday - now;
+let currentBeautyAudio = null;
+let lastClickedImg = null;
 
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+// Stop audio safely
+function stopBeautyAudio() {
+  if (currentBeautyAudio) {
+    currentBeautyAudio.pause();
+    currentBeautyAudio.currentTime = 0;
+    currentBeautyAudio = null;
+  }
+}
 
-      document.getElementById('days-left').textContent = days;
-      document.getElementById('hours-left').textContent = String(hours).padStart(2, '0');
-      document.getElementById('minutes-left').textContent = String(minutes).padStart(2, '0');
-      document.getElementById('seconds-left').textContent = String(seconds).padStart(2, '0');
-    }
+// Play song on image click
+beautyImages.forEach((img, index) => {
 
-    updateNextBirthdayCountdown();
-    setInterval(updateNextBirthdayCountdown, 1000);
+  // SINGLE CLICK → PLAY SONG
+  img.addEventListener('click', () => {
+    stopBeautyAudio();
+
+    currentBeautyAudio = new Audio(beautySongs[index]);
+    currentBeautyAudio.volume = 1.0;
+    currentBeautyAudio.play().catch(() => {});
+
+    lastClickedImg = img;
+  });
+
+  // DOUBLE CLICK → STOP SONG
+  img.addEventListener('dblclick', () => {
+    stopBeautyAudio();
+  });
+});
+
+// ===== STOP SONG WHEN IMAGE IS SCALED / LIGHTBOX OPENS =====
+// (lightbox is already declared earlier in your script)
+if (typeof lightbox !== 'undefined' && lightbox) {
+  lightbox.addEventListener('click', stopBeautyAudio);
+}
+
+// ESC key closes lightbox → stop song
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    stopBeautyAudio();
+  }
+});
+
+
+
+   
   </script>
 </body>
 </html>
